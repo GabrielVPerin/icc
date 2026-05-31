@@ -4,7 +4,9 @@
 
 // POSSIVEIS OTIMIZAÇÕES
 // 1 - É possivel utilizar uma eliminacao de gauss simplificada para matrizes 3-diagonais (tem uma aula sobre isso)
+// 2 - Loop unrolling
 
+// Implementa eliminacao de gauss
 void eliminacao_gauss(double **A, double *b, size_t n)
 {
     double m;
@@ -20,6 +22,7 @@ void eliminacao_gauss(double **A, double *b, size_t n)
     }
 }
 
+// Resolve um sistema linear triangular
 void sl_triangular(double **A, double *b, double *x, size_t n)
 {
     for(long i = n-1; i >= 0; i--) {

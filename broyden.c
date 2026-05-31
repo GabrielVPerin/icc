@@ -12,6 +12,7 @@
 // 2 - Melhorar alocação de matriz
 // 3 - Jacobiana é formada por uma matriz 3-diagonal, talvez seja possivel representá-la por 3 vetores
 // 4 - Usar funções inline (principalmente nas funções auxiliares)
+// 5 - Loop unrolling
 
 rtime_t tempoJacobiana = 0;
 rtime_t tempoSL = 0;
@@ -128,6 +129,11 @@ void print_X(double *X, size_t n)
 }
 
 // Implementa o método de newton a partir das funções acima
+// Recebe respectivamente
+// - Um vetor com os valores iniciais
+// - Um epsilon de erro
+// - Tamanho do sistema
+// - Quantidade maxima de iterações
 void newton(double *X, double epsilon, size_t n, long long max)
 {
     double *delta = malloc(n * sizeof(double));
