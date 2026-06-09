@@ -32,18 +32,19 @@ import re, sys, os
 
 campos = { 
     "L2CACHE" : "data cache miss ratio",
-    "MEM" : "Memory bandwidth \\[*MBytes/s\\]*",
+    "L3" : "L3 bandwidth \\[*MBytes/s\\]*",
     "FLOPS_DP" : "DP \\[*MFLOP/s\\]*",
     "FLOPS_AVX" : "AVX DP \\[*MFLOP/s\\]*"
 }
 
 # 'STRUCT,Info' inicia Região
-# 'TABLE,Region.*Metric,<metrica>' inicia metrica
 # '<string>' inicia linha '<string>.*,<valor>,.*', onde
 # <string> é obtido a partr de 'campo[]', tendo <metrica> como chave
 
-
 def lerDados() :
+    # 1. Pega o N atual passado como argumento pelo script Bash
+    N_atual = int(sys.argv[1])
+    
     linha = sys.stdin.readline()
     while linha and (re.match("STRUCT,Info", linha) == None) :
         linha = sys.stdin.readline()            
@@ -54,14 +55,14 @@ def lerDados() :
 
     if (linha) :
         linha = linha.split(',')
-        metrica = linha[3]
-        regiao = linha[1].split('_')
-        if regiao[1].isnumeric() :
-            ordem = int(regiao[1])
-            marker = re.sub("Region ", "", regiao[0])
-        else :
-            ordem = int(regiao[2])
-            marker = re.sub("Region ", "", regiao[0])+'_'+regiao[1]
+        metrica = linha[3].strip() # Limpa espaços ou quebras de linha
+        
+        # Extrai o nome do marcador (ex: "Jacobiana" ou "SL")
+        regiao = linha[1].split(' ')
+        marker = regiao[1].strip() 
+        
+        # Define a ordem diretamente com o N vindo do Bash
+        ordem = N_atual
 
         for linha in sys.stdin :
             if re.match(campos[metrica], linha) != None :
@@ -72,10 +73,8 @@ def lerDados() :
             valor = float(linha[1])
 
             return [ metrica, ordem, marker, valor ]
-            ## return [ metrica, marker, valor ]
 
-    return ''
-    
+    return ''    
 # fim lerDados()
 
     

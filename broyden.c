@@ -7,6 +7,8 @@
 #include "utils.h"
 #include "broyden.h"
 
+//#include <likwid.h>
+
 // POSSIVEIS OTIMIZAÇÕES
 // 1 - Não utilizar a função pow
 // 2 - Melhorar alocação de matriz
@@ -53,12 +55,13 @@ void calcula_broyden(double *Fx, double *X, size_t n)
 void calcula_jacobiana(double **jacobiana, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
-
+  //  LIKWID_MARKER_START("jacobiana");
     for(size_t i = 0; i < n; i++) {
         for(size_t j = 0; j < n; j++)
             jacobiana[i][j] = derivadas_broyden(i, j, X);
     }
 
+  //  LIKWID_MARKER_STOP("jacobiana");
     tempoJacobiana += timestamp() - tempoAntes;
 }
 
@@ -86,10 +89,12 @@ void inverte_vetor(double *X, size_t n)
 void resolve_sl(double **A, double *b, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
+    //LIKWID_MARKER_START("resolveSL");
 
     eliminacao_gauss(A, b, n);
     sl_triangular(A, b, X, n);
 
+    //LIKWID_MARKER_STOP("resolveSL");
     tempoSL += timestamp() - tempoAntes;
 }
 

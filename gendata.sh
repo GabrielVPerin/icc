@@ -7,9 +7,9 @@ CPU=3 # Core que o professor colocou no exercicio
 OUTPUT_DIR="resultados"
 mkdir -p ${OUTPUT_DIR}
 
-METRICAS="L2CACHE MEM FLOPS_DP FLOPS_AVX"
+METRICAS="L2CACHE L3 FLOPS_DP FLOPS_AVX"
 
-TAMANHOS="32 64 128 256 512" # 1000 2000 4000 8000 9000 10000 20000"
+TAMANHOS="32 64 128 256 512 1000 2000 4000 8000 9000 10000 20000"
 
 # Parâmetros fixos exigidos para os testes de desempenho
 X0="1.5"
@@ -45,8 +45,8 @@ do
         # O "likwid-perfctr" joga a saída formatada do LIKWID no arquivo .txt temporário.
         # A saída padrão do seu programa (os x1...xn e os tempos) é descartada (> /dev/null) 
         # para não sujar o terminal durante os testes estruturais.
-        echo "$n $X0 $EPSILON $MAX_ITER" | likwid-perfctr -O -C ${CPU} -g ${m} -o ${LIKWID_OUT} -m ./${PROG} > /dev/null
-        
+	#        echo "$n $X0 $EPSILON $MAX_ITER" | likwid-perfctr -O -C ${CPU} -g ${m} -o ${LIKWID_OUT} -m ./${PROG} > /dev/null
+        likwid-perfctr -O -C ${CPU} -g ${m} -o ${LIKWID_OUT} -m ./${PROG} $n $X0 $EPSILON $MAX_ITER > /dev/null
         # Junta o resultado deste N no arquivo de log geral desta métrica
         cat ${LIKWID_OUT} >> ${LIKWID_LOG}
         
@@ -56,7 +56,7 @@ do
 
     echo "=== Processando dados de ${m} com genplot.py ==="
     # O script Python lê o arquivo .log unificado e gera a tabela .csv limpa dentro da pasta
-    python3 genplot.py < ${LIKWID_LOG} > "${OUTPUT_DIR}/${m}.csv"
+    python3 genplot.py $n < ${LIKWID_LOG} > "${OUTPUT_DIR}/${m}.csv"
 done
 
 echo "=== Todos os testes foram concluídos! ==="
