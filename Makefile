@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -O2
-LIBS = -lm
+CFLAGS = -Wall -Wextra -O3 -march=native -mavx -fopt-info-vec -DLIKWID_PERFMON
+LIBS = -lm -llikwid
 TARGET = broyden
 SRCS = main.c broyden.c gauss.c utils.c
 
