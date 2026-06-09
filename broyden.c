@@ -94,7 +94,7 @@ void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
     rtime_t tempoAntes = timestamp();
 
     eliminacao_gauss(d, a, c, b, n);
-    sl_triangular(d, a, c, b, X, n);
+    sl_triangular(d, c, b, X, n);
 
     tempoSL += timestamp() - tempoAntes;
 }
