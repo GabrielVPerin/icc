@@ -1,0 +1,17 @@
+=== Compilando ===
+rm -f main.o broyden.o gauss.o utils.o broyden *.csv *.log *.txt
+gcc -DLIKWID_PERFMON -I/home/soft/likwid/include -Wall -Wextra -O3 -march=native -mavx -fopt-info-vec -c main.c -o main.o
+gcc -DLIKWID_PERFMON -I/home/soft/likwid/include -Wall -Wextra -O3 -march=native -mavx -fopt-info-vec -c broyden.c -o broyden.o
+gcc -DLIKWID_PERFMON -I/home/soft/likwid/include -Wall -Wextra -O3 -march=native -mavx -fopt-info-vec -c gauss.c -o gauss.o
+gcc -DLIKWID_PERFMON -I/home/soft/likwid/include -Wall -Wextra -O3 -march=native -mavx -fopt-info-vec -c utils.c -o utils.o
+gcc main.o broyden.o gauss.o utils.o -L/home/soft/likwid/lib -llikwid -lm -o broyden
+=== L2CACHE ===
+   N=32
+   N=64
+   N=128
+   N=256
+   N=512
+   N=1000
+   N=2000
+   N=4000
+   N=8000
