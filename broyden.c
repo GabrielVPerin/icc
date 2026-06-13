@@ -55,7 +55,7 @@ void calcula_broyden(double *Fx, double *X, size_t n)
 void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
-    LIKWID_MARKER_START("jacobiana");
+    LIKWID_MARKER_START("Jacobiana");
     for (size_t i = 0; i < n; i++)
     {
         d[i] = derivadas_broyden(i, i, X);
@@ -63,7 +63,7 @@ void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
         c[i] = derivadas_broyden(i, i + 1, X);
     }
 
-    LIKWID_MARKER_STOP("jacobiana");
+    LIKWID_MARKER_STOP("Jacobiana");
     tempoJacobiana += timestamp() - tempoAntes;
 }
 
@@ -92,12 +92,12 @@ void inverte_vetor(double *X, size_t n)
 void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
-    LIKWID_MARKER_START("resolveSL");
+    LIKWID_MARKER_START("Gauss");
 
     eliminacao_gauss(d, a, c, b, n);
     sl_triangular(d, c, b, X, n);
 
-    LIKWID_MARKER_STOP("resolveSL");
+    LIKWID_MARKER_STOP("Gauss");
     tempoSL += timestamp() - tempoAntes;
 }
 

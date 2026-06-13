@@ -44,9 +44,9 @@ int main(int argc, char **argv)
         X[i] = x0;
 
     rtime_t tempoAntes = timestamp();
-    LIKWID_MARKER_START("marcador_newton");
+    LIKWID_MARKER_START("Newton");
     newton(X, epsilon, n, max);
-    LIKWID_MARKER_STOP("marcador_newton");
+    LIKWID_MARKER_STOP("Newton");
     rtime_t tempoDepois = timestamp();
 
     fprintf(saidaArq, "\n#################\n");

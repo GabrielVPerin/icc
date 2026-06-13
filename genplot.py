@@ -1,143 +1,73 @@
-#! /usr/bin/env python3
-# coding=utf8
+#!/usr/bin/env python3
 
-# Descomente as 2 linhas abaixo se quiser que Python procure por modulos
-# em outros diretórios que não os do sistema e o diretório corrente.
-## import sys, os
-## sys.path.extend([ '~/lib/python', '.', '..' ])
-# Ou em seu ambiente shell, crie e exporte a variavel de ambiente PYTHONPATH.
-# Coloque a linha abaixo em seu arquivo '~/.bashrc' ou '~/.profile:
-## export PYTHONPATH="${HOME}/lib/python:.:.."
-#
-
-# import numpy as np
-# import matplotlib.pyplot as plt
-
-from string import *
 from math import *
-import re, sys, os
+import re
+import sys
 
-
-#  "CACHE" : "data cache misses",
-#  "CACHE" : "data cache miss ratio",
-#  "CACHE" : "data cache miss rate",
-#  "L2CACHE" : "L2 miss ratio",
-#  "L2CACHE" : "L2 miss rate",
-#  "L3" : "L3 bandwidth \[*MBytes/s\]*",
-#  "MEM" : "Memory bandwidth \[*MBytes/s\]*",
-#  "MEM" : "Memory read bandwidth",
-#  "MEM" : "Memory write bandwidth",
-#  "TIME" : "Runtime \(RDTSC\) \[*s\]*",
-#  "ENERGY" : "Power \[*W\]*"
-
-campos = { 
-    "L2CACHE" : "data cache miss ratio",
-    "L3" : "L3 bandwidth \\[*MBytes/s\\]*",
-    "FLOPS_DP" : "DP \\[*MFLOP/s\\]*",
-    "FLOPS_AVX" : "AVX DP \\[*MFLOP/s\\]*"
+campos = {
+    "L2CACHE": "data cache miss ratio",
+    "L3": "L3 bandwidth \\[*MBytes/s\\]*",
+    "FLOPS_DP": "DP \\[*MFLOP/s\\]*",
+    "FLOPS_AVX": "AVX DP \\[*MFLOP/s\\]*"
 }
 
-# 'STRUCT,Info' inicia Região
-# '<string>' inicia linha '<string>.*,<valor>,.*', onde
-# <string> é obtido a partr de 'campo[]', tendo <metrica> como chave
 
-def lerDados() :
-    # 1. Pega o N atual passado como argumento pelo script Bash
+def lerDados():
     N_atual = int(sys.argv[1])
-    
-    linha = sys.stdin.readline()
-    while linha and (re.match("STRUCT,Info", linha) == None) :
-        linha = sys.stdin.readline()            
 
-    for linha in sys.stdin :
-        if re.match("TABLE,Region.*Metric,", linha) != None :
+    linha = sys.stdin.readline()
+    while linha and re.match("STRUCT,Info", linha) is None:
+        linha = sys.stdin.readline()
+
+    for linha in sys.stdin:
+        if re.match("TABLE,Region.*Metric,", linha):
             break
 
-    if (linha) :
+    if linha:
         linha = linha.split(',')
-        metrica = linha[3].strip() # Limpa espaços ou quebras de linha
-        
-        # Extrai o nome do marcador (ex: "Jacobiana" ou "SL")
+
+        metrica = linha[3].strip()
+
         regiao = linha[1].split(' ')
-        marker = regiao[1].strip() 
-        
-        # Define a ordem diretamente com o N vindo do Bash
+        marker = regiao[1].strip()
+
         ordem = N_atual
 
-        for linha in sys.stdin :
-            if re.match(campos[metrica], linha) != None :
+        for linha in sys.stdin:
+            if re.match(campos[metrica], linha):
                 break
 
-        if (linha) :
+        if linha:
             linha = linha.split(',')
             valor = float(linha[1])
 
-            return [ metrica, ordem, marker, valor ]
+            return [metrica, ordem, marker, valor]
 
-    return ''    
-# fim lerDados()
+    return None
 
-    
-# =====================================================
-# Inicio Programa principal
-# =====================================================
-#
-# Descomente a linha abaixo se arquivo pode ser importado como módulo
-# via 'import .....'
-## if __name__ == '__main__':
 
-# Lê saída de likwid-perfctr -O e gera saída para gnuplot gerar
-# um gráfico para cada métrica, cada gráfico contendo os dados de todos os markers
-# 
-
-# saida = {<metrica> : {<ordem> : [ [<marker>, <valor>] ]} }
 saida = {}
 
-# item possui campos: marker, n, metrica, valor.
-# 'n' é inteiro, 'valor' é double. 'marker' e 'metrica' são strings
-
 item = lerDados()
-while item :
-    # print(item)
-    if item[0] in saida :
-        if item[1] in saida[item[0]] :
-            saida[item[0]][item[1]].append(item[2:])
-        else :
-            saida[item[0]][item[1]] = [item[2:]]
-    else :
-        saida[item[0]] = {item[1]:[item[2:]]}
+
+while item:
+    metrica, n, marker, valor = item
+
+    if metrica not in saida:
+        saida[metrica] = {}
+
+    if n not in saida[metrica]:
+        saida[metrica][n] = []
+
+    saida[metrica][n].append([marker, valor])
 
     item = lerDados()
 
-# print(saida)
-# exit()
+for metrica in saida:
+    for n in sorted(saida[metrica]):
+        linha = [str(n)]
 
-    
-# gera tabela para uso em gnuplot ou pyplot/matplotlib
-gnuplot = ''
+        for marker, valor in saida[metrica][n]:
+            linha.append(str(valor))
 
-for i in saida :
-    # print(i)
-    ordens = []
-    for j in saida[i] :
-        ordens.append(j)
-
-    # print(ordens,'\n\n',gnuplot)
-    for j in ordens :
-        gnuplot += '{0}'.format(j)
-        # print('@@@',saida[i][j])
-        for k in saida[i][j] :
-            gnuplot += ',{0}'.format(k[1])
-            
-        gnuplot += '\n'
-    # FIM for j in ordens
-
-    # grava tabela de pontos
-    print (gnuplot, end='')
-    
-    # plotFile = i+'.csv'
-    # fp = open(plotFile, "w")
-    # fp.writelines(gnuplot)
-    # fp.close()
-# FIM for i in saida
-
+        print(",".join(linha))
