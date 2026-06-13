@@ -12,7 +12,7 @@ METRICAS="L2CACHE L3 FLOPS_DP FLOPS_AVX"
 TAMANHOS="32 64 128 256 512 1000 2000 4000 8000 9000 10000 20000"
 
 # Parâmetros fixos exigidos para os testes de desempenho
-X0="1.5"
+X0="0"
 EPSILON="0.0"
 MAX_ITER="25"
 

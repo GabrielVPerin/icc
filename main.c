@@ -5,7 +5,7 @@
 #include "broyden.h"
 #include "utils.h"
 
-// #include <likwid.h>
+#include <likwid.h>
 int main(int argc, char **argv)
 {
     if (argc < 5 || argc > 7)
@@ -32,7 +32,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-   // LIKWID_MARKER_INIT;
+    LIKWID_MARKER_INIT;
 
     size_t n = atoll(argv[1]);
     double x0 = atof(argv[2]);
@@ -44,9 +44,9 @@ int main(int argc, char **argv)
         X[i] = x0;
 
     rtime_t tempoAntes = timestamp();
-    //LIKWID_MARKER_START("marcador_newton");
+    LIKWID_MARKER_START("marcador_newton");
     newton(X, epsilon, n, max);
-    //LIKWID_MARKER_STOP("marcador_newton");
+    LIKWID_MARKER_STOP("marcador_newton");
     rtime_t tempoDepois = timestamp();
 
     fprintf(saidaArq, "\n#################\n");
@@ -59,7 +59,7 @@ int main(int argc, char **argv)
         fclose(arquivoSaida);
     free(X);
 
-    //LIKWID_MARKER_CLOSE;
+    LIKWID_MARKER_CLOSE;
 
     return EXIT_SUCCESS;
 }

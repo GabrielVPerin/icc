@@ -7,7 +7,7 @@
 #include "utils.h"
 #include "broyden.h"
 
-//#include <likwid.h>
+#include <likwid.h>
 
 // POSSIVEIS OTIMIZAÇÕES
 // 1 - Não utilizar a função pow
@@ -23,22 +23,22 @@ FILE *saidaArq;
 // Calcula o resultado de uma linha do sistema de broyden
 double equacoes_broyden(size_t linha, size_t n, double *X)
 {
-    if(linha == 0)
+    if (linha == 0)
         return (-2.0 * pow(X[0], 2) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
-    else if(linha == n-1)
-        return(-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha-1]);
+    else if (linha == n - 1)
+        return (-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha - 1]);
 
-    return (-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha-1] - 2.0 * X[linha+1] + 1.0);
+    return (-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha - 1] - 2.0 * X[linha + 1] + 1.0);
 }
 
 // Calcula o resultado da derivada de uma linha do sistema de broyden
 double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
 {
-    if(linha == variavelDerivada)
+    if (linha == variavelDerivada)
         return (-4.0 * X[linha] + 3.0);
-    else if(linha == (variavelDerivada - 1))
+    else if (linha == (variavelDerivada - 1))
         return -2.0;
-    else if(linha == (variavelDerivada + 1))
+    else if (linha == (variavelDerivada + 1))
         return -1.0;
 
     return 0.0;
@@ -47,7 +47,7 @@ double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
 // Calcula todas as linhas do sistema de broyden
 void calcula_broyden(double *Fx, double *X, size_t n)
 {
-    for(size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
         Fx[i] = equacoes_broyden(i, n, X);
 }
 
@@ -55,14 +55,15 @@ void calcula_broyden(double *Fx, double *X, size_t n)
 void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
-  //  LIKWID_MARKER_START("jacobiana");
-    for(size_t i = 0; i < n; i++) {
+    LIKWID_MARKER_START("jacobiana");
+    for (size_t i = 0; i < n; i++)
+    {
         d[i] = derivadas_broyden(i, i, X);
         a[i] = derivadas_broyden(i + 1, i, X);
         c[i] = derivadas_broyden(i, i + 1, X);
     }
 
-  //  LIKWID_MARKER_STOP("jacobiana");
+    LIKWID_MARKER_STOP("jacobiana");
     tempoJacobiana += timestamp() - tempoAntes;
 }
 
@@ -71,8 +72,9 @@ double max_vetor(double *X, size_t n)
 {
     double melhor = fabs(X[0]);
 
-    for(size_t i = 1; i < n; i++) {
-        if(fabs(X[i]) > melhor)
+    for (size_t i = 1; i < n; i++)
+    {
+        if (fabs(X[i]) > melhor)
             melhor = fabs(X[i]);
     }
 
@@ -82,7 +84,7 @@ double max_vetor(double *X, size_t n)
 // Inverte o sinal de todos os valores do vetor
 void inverte_vetor(double *X, size_t n)
 {
-    for(size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
         X[i] = -X[i];
 }
 
@@ -90,19 +92,19 @@ void inverte_vetor(double *X, size_t n)
 void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
-    //LIKWID_MARKER_START("resolveSL");
+    LIKWID_MARKER_START("resolveSL");
 
     eliminacao_gauss(d, a, c, b, n);
     sl_triangular(d, c, b, X, n);
 
-    //LIKWID_MARKER_STOP("resolveSL");
+    LIKWID_MARKER_STOP("resolveSL");
     tempoSL += timestamp() - tempoAntes;
 }
 
 // Soma dois vetores e guarda o resultado no primeiro vetor
 void soma_vetores(double *a, double *b, size_t n)
 {
-    for(size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n; i++)
         a[i] += b[i];
 }
 
@@ -110,7 +112,8 @@ void soma_vetores(double *a, double *b, size_t n)
 double **aloca_matriz(size_t n)
 {
     double **matriz = malloc(n * sizeof(double *));
-    for(size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++)
+    {
         matriz[i] = malloc(n * sizeof(double));
     }
 
@@ -120,7 +123,8 @@ double **aloca_matriz(size_t n)
 // Destroi uma matriz de tamanho n
 void destroi_matriz(double **matriz, size_t n)
 {
-    for(size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++)
+    {
         free(matriz[i]);
     }
 
@@ -130,8 +134,8 @@ void destroi_matriz(double **matriz, size_t n)
 // Printa um vetor (usado para debug)
 void print_X(double *X, size_t n)
 {
-    for(size_t i = 0; i < n; i++)
-        fprintf(saidaArq, "x%zu = %f\n", i+1, X[i]);
+    for (size_t i = 0; i < n; i++)
+        fprintf(saidaArq, "x%zu = %f\n", i + 1, X[i]);
 }
 
 // Implementa o método de newton a partir das funções acima
@@ -148,10 +152,11 @@ void newton(double *X, double epsilon, size_t n, long long max)
     double *a = malloc(n * sizeof(double));
     double *c = malloc(n * sizeof(double));
 
-    for(long long i = 0; i < max-1; i++) {
+    for (long long i = 0; i < max - 1; i++)
+    {
         fprintf(saidaArq, "#\n");
         calcula_broyden(Fx, X, n);
-        if(max_vetor(Fx, n) < epsilon)
+        if (max_vetor(Fx, n) < epsilon)
             break;
 
         calcula_jacobiana(a, c, d, X, n);
@@ -161,7 +166,7 @@ void newton(double *X, double epsilon, size_t n, long long max)
 
         print_X(X, n);
 
-        if(max_vetor(delta, n) < epsilon)
+        if (max_vetor(delta, n) < epsilon)
             break;
     }
 
