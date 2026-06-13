@@ -7,23 +7,28 @@
 // 2 - Loop unrolling
 
 // Implementa eliminacao de gauss
-void eliminacao_gauss(double *d, double *a, double *c, double *b, size_t n)
+void eliminacao_gauss(double **A, double *b, size_t n)
 {
     double m;
 
-    for(size_t i = 0; i < n-1; i++) {
-        m = a[i] / d[i];
-        a[i] = 0.0;
-        d[i+1] -= c[i] * m;
-        b[i+1] -= b[i] * m;
+    for(size_t i = 0; i < n; i++) {
+        for(size_t k = i+1; k < n; k++) {
+            m = A[k][i] / A[i][i];
+            A[k][i] = 0.0;
+            for(size_t j = i+1; j < n; j++)
+                A[k][j] -= A[i][j] * m;
+            b[k] -= b[i] * m;
+        }
     }
 }
 
 // Resolve um sistema linear triangular
-void sl_triangular(double *d, double *c, double *b, double *x, size_t n)
+void sl_triangular(double **A, double *b, double *x, size_t n)
 {
-    x[n-1] = b[n-1] / d[n-1];
-    for(long long i = n-2; i >= 0; i--) {
-        x[i] = (b[i] - c[i] * x[i+1]) / d[i];
+    for(long i = n-1; i >= 0; i--) {
+        x[i] = b[i];
+        for(size_t j = i+1; j < n; j++)
+            x[i] -= A[i][j] * x[j];
+        x[i] /= A[i][i];
     }
 }

@@ -52,15 +52,15 @@ void calcula_broyden(double *Fx, double *X, size_t n)
 }
 
 // Cria a matriz jacobiana a partir das derivadas
-void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
+void calcula_jacobiana(double **jacobiana, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Jacobiana");
+
     for (size_t i = 0; i < n; i++)
     {
-        d[i] = derivadas_broyden(i, i, X);
-        a[i] = derivadas_broyden(i + 1, i, X);
-        c[i] = derivadas_broyden(i, i + 1, X);
+        for (size_t j = 0; j < n; j++)
+            jacobiana[i][j] = derivadas_broyden(i, j, X);
     }
 
     LIKWID_MARKER_STOP("Jacobiana");
@@ -89,13 +89,13 @@ void inverte_vetor(double *X, size_t n)
 }
 
 // Resolve um SL
-void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
+void resolve_sl(double **A, double *b, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Gauss");
 
-    eliminacao_gauss(d, a, c, b, n);
-    sl_triangular(d, c, b, X, n);
+    eliminacao_gauss(A, b, n);
+    sl_triangular(A, b, X, n);
 
     LIKWID_MARKER_STOP("Gauss");
     tempoSL += timestamp() - tempoAntes;
@@ -148,9 +148,7 @@ void newton(double *X, double epsilon, size_t n, long long max)
 {
     double *delta = malloc(n * sizeof(double));
     double *Fx = malloc(n * sizeof(double));
-    double *d = malloc(n * sizeof(double));
-    double *a = malloc(n * sizeof(double));
-    double *c = malloc(n * sizeof(double));
+    double **jacobiana = aloca_matriz(n);
 
     for (long long i = 0; i < max - 1; i++)
     {
@@ -159,9 +157,9 @@ void newton(double *X, double epsilon, size_t n, long long max)
         if (max_vetor(Fx, n) < epsilon)
             break;
 
-        calcula_jacobiana(a, c, d, X, n);
+        calcula_jacobiana(jacobiana, X, n);
         inverte_vetor(Fx, n);
-        resolve_sl(d, a, c, Fx, delta, n);
+        resolve_sl(jacobiana, Fx, delta, n);
         soma_vetores(X, delta, n);
 
         print_X(X, n);
@@ -170,9 +168,7 @@ void newton(double *X, double epsilon, size_t n, long long max)
             break;
     }
 
-    free(d);
-    free(a);
-    free(c);
     free(delta);
     free(Fx);
+    destroi_matriz(jacobiana, n);
 }

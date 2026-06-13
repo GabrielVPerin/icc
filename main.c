@@ -6,6 +6,7 @@
 #include "utils.h"
 
 #include <likwid.h>
+
 int main(int argc, char **argv)
 {
     if (argc < 5 || argc > 7)
