@@ -5,12 +5,11 @@ import re
 import sys
 
 campos = {
-    "L2CACHE": "data cache miss ratio",
-    "L3": "L3 bandwidth \\[*MBytes/s\\]*",
-    "FLOPS_DP": "DP \\[*MFLOP/s\\]*",
-    "FLOPS_AVX": "AVX DP \\[*MFLOP/s\\]*"
+    "L2CACHE": r"L2 miss ratio",
+    "L3": r"L3 bandwidth",
+    "FLOPS_DP": r"DP MFLOP/s",
+    "FLOPS_AVX": r"Packed DP MFLOP/s"
 }
-
 
 def lerDados():
     N_atual = int(sys.argv[1])
