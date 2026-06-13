@@ -21,6 +21,7 @@ rtime_t tempoSL = 0;
 FILE *saidaArq;
 
 // Calcula o resultado de uma linha do sistema de broyden
+/*
 double equacoes_broyden(size_t linha, size_t n, double *X)
 {
     if (linha == 0)
@@ -30,8 +31,10 @@ double equacoes_broyden(size_t linha, size_t n, double *X)
 
     return (-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha - 1] - 2.0 * X[linha + 1] + 1.0);
 }
+*/
 
 // Calcula o resultado da derivada de uma linha do sistema de broyden
+/*
 double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
 {
     if (linha == variavelDerivada)
@@ -43,24 +46,60 @@ double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
 
     return 0.0;
 }
+*/
 
 // Calcula todas as linhas do sistema de broyden
-void calcula_broyden(double *Fx, double *X, size_t n)
+static void calcula_broyden(double *Fx, double *X, size_t n)
 {
-    for (size_t i = 0; i < n; i++)
-        Fx[i] = equacoes_broyden(i, n, X);
+    // for (size_t i = 0; i < n; i++)
+    //     Fx[i] = equacoes_broyden(i, n, X);
+
+    Fx[0] = (-2.0 * (X[0] * X[0]) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
+    for (size_t i = 1; i < (n - 1) - (n - 1) % 4; i++)
+    {
+        Fx[i] = (-2.0 * (X[i] * X[i]) + 3.0 * X[i] - X[i - 1] - 2.0 * X[i + 1] + 1.0);
+        Fx[i + 1] = (-2.0 * (X[i + 1] * X[i + 1]) + 3.0 * X[i + 1] - X[(i + 1) - 1] - 2.0 * X[(i + 1) + 1] + 1.0);
+        Fx[i + 2] = (-2.0 * (X[i + 2] * X[i + 2]) + 3.0 * X[i + 2] - X[(i + 2) - 1] - 2.0 * X[(i + 2) + 1] + 1.0);
+        Fx[i + 3] = (-2.0 * (X[i + 3] * X[i + 3]) + 3.0 * X[i + 3] - X[(i + 3) - 1] - 2.0 * X[(i + 3) + 1] + 1.0);
+    }
+    for (size_t i = (n - 1) - (n - 1) % 4; i < n - 1; i++)
+        Fx[i] = (-2.0 * (X[i] * X[i]) + 3.0 * X[i] - X[i - 1] - 2.0 * X[i + 1] + 1.0);
+
+    Fx[n - 1] = (-2.0 * (X[n - 1] * X[n - 1]) + 3.0 * X[n - 1] - X[n - 2]);
 }
 
 // Cria a matriz jacobiana a partir das derivadas
-void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
+static void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Jacobiana");
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < n - n % 4; i = i + 4)
     {
-        d[i] = derivadas_broyden(i, i, X);
-        a[i] = derivadas_broyden(i + 1, i, X);
-        c[i] = derivadas_broyden(i, i + 1, X);
+        // d[i] = derivadas_broyden(i, i, X);
+        // a[i] = derivadas_broyden(i + 1, i, X);
+        // c[i] = derivadas_broyden(i, i + 1, X);
+
+        d[i] = -4.0 * X[i] + 3.0;
+        a[i] = -1.0;
+        c[i] = -2.0;
+
+        d[i + 1] = -4.0 * X[i + 1] + 3.0;
+        a[i + 1] = -1.0;
+        c[i + 1] = -2.0;
+
+        d[i + 2] = -4.0 * X[i + 2] + 3.0;
+        a[i + 2] = -1.0;
+        c[i + 2] = -2.0;
+
+        d[i + 3] = -4.0 * X[i + 3] + 3.0;
+        a[i + 3] = -1.0;
+        c[i + 3] = -2.0;
+    }
+    for (size_t i = n - n % 4; i < n; i++)
+    {
+        d[i] = -4.0 * X[i] + 3.0;
+        a[i] = -1.0;
+        c[i] = -2.0;
     }
 
     LIKWID_MARKER_STOP("Jacobiana");
@@ -68,7 +107,7 @@ void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
 }
 
 // Encontra o valor em modulo maximo de um vetor
-double max_vetor(double *X, size_t n)
+static double max_vetor(double *X, size_t n)
 {
     double melhor = fabs(X[0]);
 
@@ -82,14 +121,14 @@ double max_vetor(double *X, size_t n)
 }
 
 // Inverte o sinal de todos os valores do vetor
-void inverte_vetor(double *X, size_t n)
+static inline void inverte_vetor(double *X, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         X[i] = -X[i];
 }
 
 // Resolve um SL
-void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
+static void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Gauss");
@@ -102,37 +141,33 @@ void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
 }
 
 // Soma dois vetores e guarda o resultado no primeiro vetor
-void soma_vetores(double *a, double *b, size_t n)
+static inline void soma_vetores(double *a, double *b, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         a[i] += b[i];
 }
 
 // Aloca uma matriz de tamanho n
-double **aloca_matriz(size_t n)
+static double **aloca_matriz(size_t n)
 {
     double **matriz = malloc(n * sizeof(double *));
     for (size_t i = 0; i < n; i++)
-    {
         matriz[i] = malloc(n * sizeof(double));
-    }
 
     return matriz;
 }
 
 // Destroi uma matriz de tamanho n
-void destroi_matriz(double **matriz, size_t n)
+static void destroi_matriz(double **matriz, size_t n)
 {
     for (size_t i = 0; i < n; i++)
-    {
         free(matriz[i]);
-    }
 
     free(matriz);
 }
 
 // Printa um vetor (usado para debug)
-void print_X(double *X, size_t n)
+static void print_X(double *X, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         fprintf(saidaArq, "x%zu = %f\n", i + 1, X[i]);

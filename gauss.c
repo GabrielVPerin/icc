@@ -6,6 +6,8 @@
 // 1 - É possivel utilizar uma eliminacao de gauss simplificada para matrizes 3-diagonais (tem uma aula sobre isso)
 // 2 - Loop unrolling
 
+// Acho que esses unrollings servem de nada :(
+
 // Implementa eliminacao de gauss
 void eliminacao_gauss(double *d, double *a, double *c, double *b, size_t n)
 {
