@@ -45,14 +45,14 @@ static inline double derivadas_broyden(size_t linha, size_t variavelDerivada, do
 }
 
 // Calcula todas as linhas do sistema de broyden
-void calcula_broyden(double *Fx, double *X, size_t n)
+static void calcula_broyden(double * restrict Fx, double * restrict X, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         Fx[i] = equacoes_broyden(i, n, X);
 }
 
 // Cria a matriz jacobiana a partir das derivadas
-void calcula_jacobiana(double * restrict a, double * restrict c, double * restrict d, double * restrict X, size_t n)
+static void calcula_jacobiana(double * restrict a, double * restrict c, double * restrict d, double * restrict X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Jacobiana");
