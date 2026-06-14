@@ -24,11 +24,11 @@ FILE *saidaArq;
 double equacoes_broyden(size_t linha, size_t n, double *X)
 {
     if (linha == 0)
-        return (-2.0 * pow(X[0], 2) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
+        return (-2.0 * (X[0] * X[0]) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
     else if (linha == n - 1)
-        return (-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha - 1]);
+        return (-2.0 * (X[linha] * X[linha]) + 3.0 * X[linha] - X[linha - 1]);
 
-    return (-2.0 * pow(X[linha], 2) + 3.0 * X[linha] - X[linha - 1] - 2.0 * X[linha + 1] + 1.0);
+    return (-2.0 * (X[linha] * X[linha])+ 3.0 * X[linha] - X[linha - 1] - 2.0 * X[linha + 1] + 1.0);
 }
 
 // Calcula o resultado da derivada de uma linha do sistema de broyden
