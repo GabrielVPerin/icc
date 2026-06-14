@@ -21,7 +21,7 @@ rtime_t tempoSL = 0;
 FILE *saidaArq;
 
 // Calcula o resultado de uma linha do sistema de broyden
-double equacoes_broyden(size_t linha, size_t n, double *X)
+static inline double equacoes_broyden(size_t linha, size_t n, double *X)
 {
     if (linha == 0)
         return (-2.0 * (X[0] * X[0]) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
@@ -32,7 +32,7 @@ double equacoes_broyden(size_t linha, size_t n, double *X)
 }
 
 // Calcula o resultado da derivada de uma linha do sistema de broyden
-double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
+static inline double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
 {
     if (linha == variavelDerivada)
         return (-4.0 * X[linha] + 3.0);
@@ -68,7 +68,7 @@ void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
 }
 
 // Encontra o valor em modulo maximo de um vetor
-double max_vetor(double *X, size_t n)
+static inline double max_vetor(double *X, size_t n)
 {
     double melhor = fabs(X[0]);
 
@@ -82,14 +82,14 @@ double max_vetor(double *X, size_t n)
 }
 
 // Inverte o sinal de todos os valores do vetor
-void inverte_vetor(double *X, size_t n)
+static inline void inverte_vetor(double *X, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         X[i] = -X[i];
 }
 
 // Resolve um SL
-void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
+static void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Gauss");
@@ -102,37 +102,14 @@ void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
 }
 
 // Soma dois vetores e guarda o resultado no primeiro vetor
-void soma_vetores(double *a, double *b, size_t n)
+static inline void soma_vetores(double *a, double *b, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         a[i] += b[i];
 }
 
-// Aloca uma matriz de tamanho n
-double **aloca_matriz(size_t n)
-{
-    double **matriz = malloc(n * sizeof(double *));
-    for (size_t i = 0; i < n; i++)
-    {
-        matriz[i] = malloc(n * sizeof(double));
-    }
-
-    return matriz;
-}
-
-// Destroi uma matriz de tamanho n
-void destroi_matriz(double **matriz, size_t n)
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        free(matriz[i]);
-    }
-
-    free(matriz);
-}
-
 // Printa um vetor (usado para debug)
-void print_X(double *X, size_t n)
+static void print_X(double *X, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         fprintf(saidaArq, "x%zu = %f\n", i + 1, X[i]);
