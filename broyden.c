@@ -54,11 +54,6 @@ void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
 
-    // for(size_t i = 0; i < n; i++) {
-    //     for(size_t j = 0; j < n; j++)
-    //         jacobiana[i][j] = derivadas_broyden(i, j, X);
-    // }
-
     for(size_t i = 0; i < n; i++) {
         d[i] = derivadas_broyden(i, i, X);
         a[i] = derivadas_broyden(i + 1, i, X);
@@ -104,27 +99,6 @@ void soma_vetores(double *a, double *b, size_t n)
 {
     for(size_t i = 0; i < n; i++)
         a[i] += b[i];
-}
-
-// Aloca uma matriz de tamanho n
-double **aloca_matriz(size_t n)
-{
-    double **matriz = malloc(n * sizeof(double *));
-    for(size_t i = 0; i < n; i++) {
-        matriz[i] = malloc(n * sizeof(double));
-    }
-
-    return matriz;
-}
-
-// Destroi uma matriz de tamanho n
-void destroi_matriz(double **matriz, size_t n)
-{
-    for(size_t i = 0; i < n; i++) {
-        free(matriz[i]);
-    }
-
-    free(matriz);
 }
 
 // Printa um vetor (usado para debug)
