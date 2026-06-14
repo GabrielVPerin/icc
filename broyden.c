@@ -52,7 +52,7 @@ void calcula_broyden(double *Fx, double *X, size_t n)
 }
 
 // Cria a matriz jacobiana a partir das derivadas
-void calcula_jacobiana(double *a, double *c, double *d, double *X, size_t n)
+void calcula_jacobiana(double * restrict a, double * restrict c, double * restrict d, double * restrict X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Jacobiana");
@@ -89,7 +89,7 @@ static inline void inverte_vetor(double *X, size_t n)
 }
 
 // Resolve um SL
-static void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
+static void resolve_sl(double * restrict d, double * restrict a, double * restrict c, double * restrict b, double * restrict X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Gauss");
@@ -102,7 +102,7 @@ static void resolve_sl(double *d, double *a, double *c, double *b, double *X, si
 }
 
 // Soma dois vetores e guarda o resultado no primeiro vetor
-static inline void soma_vetores(double *a, double *b, size_t n)
+static inline void soma_vetores(double * restrict a, double * restrict b, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         a[i] += b[i];

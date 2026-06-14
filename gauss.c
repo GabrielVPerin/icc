@@ -7,7 +7,7 @@
 // 2 - Loop unrolling
 
 // Implementa eliminacao de gauss
-void eliminacao_gauss(double *d, double *a, double *c, double *b, size_t n)
+void eliminacao_gauss(double * restrict d, double * restrict a, double * restrict c, double * restrict b, size_t n)
 {
     double m;
 
@@ -20,7 +20,7 @@ void eliminacao_gauss(double *d, double *a, double *c, double *b, size_t n)
 }
 
 // Resolve um sistema linear triangular
-void sl_triangular(double *d, double *c, double *b, double *x, size_t n)
+void sl_triangular(const double * restrict d, const double * restrict c, double * restrict b, double * restrict x, size_t n)
 {
     x[n-1] = b[n-1] / d[n-1];
     for(long long i = n-2; i >= 0; i--) {
