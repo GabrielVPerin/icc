@@ -15,8 +15,6 @@ void newton(double *X, double epsilon, size_t n, long long max);
 
 extern rtime_t tempoJacobiana;
 
-extern rtime_t tempoSL;
-
 extern FILE *saidaArq;
 
 #endif
