@@ -17,7 +17,6 @@
 // 5 - Loop unrolling
 
 rtime_t tempoJacobiana = 0;
-rtime_t tempoSL = 0;
 FILE *saidaArq;
 
 // Calcula o resultado de uma linha do sistema de broyden
@@ -86,19 +85,6 @@ static inline void inverte_vetor(double *X, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         X[i] = -X[i];
-}
-
-// Resolve um SL
-static void resolve_sl(double *d, double *a, double *c, double *b, double *X, size_t n)
-{
-    rtime_t tempoAntes = timestamp();
-    LIKWID_MARKER_START("Gauss");
-
-    eliminacao_gauss(d, a, c, b, n);
-    sl_triangular(d, c, b, X, n);
-
-    LIKWID_MARKER_STOP("Gauss");
-    tempoSL += timestamp() - tempoAntes;
 }
 
 // Soma dois vetores e guarda o resultado no primeiro vetor

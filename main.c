@@ -4,6 +4,7 @@
 
 #include "broyden.h"
 #include "utils.h"
+#include "gauss.h"
 
 #include <likwid.h>
 int main(int argc, char **argv)
