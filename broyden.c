@@ -46,13 +46,13 @@ FILE *saidaArq;
 */
 
 // Calcula todas as linhas do sistema de broyden
-static void calcula_broyden(double * restrict Fx, double * restrict X, size_t n)
+static void calcula_broyden(double *restrict Fx, double *restrict X, size_t n)
 {
     // for (size_t i = 0; i < n; i++)
     //     Fx[i] = equacoes_broyden(i, n, X);
 
     Fx[0] = (-2.0 * (X[0] * X[0]) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
-    for (size_t i = 1; i < (n - 1) - (n - 1) % 4; i++)
+    for (size_t i = 1; i < (n - 1) - (n - 1) % 4; i = i + 4)
     {
         Fx[i] = (-2.0 * (X[i] * X[i]) + 3.0 * X[i] - X[i - 1] - 2.0 * X[i + 1] + 1.0);
         Fx[i + 1] = (-2.0 * (X[i + 1] * X[i + 1]) + 3.0 * X[i + 1] - X[(i + 1) - 1] - 2.0 * X[(i + 1) + 1] + 1.0);
@@ -65,9 +65,8 @@ static void calcula_broyden(double * restrict Fx, double * restrict X, size_t n)
     Fx[n - 1] = (-2.0 * (X[n - 1] * X[n - 1]) + 3.0 * X[n - 1] - X[n - 2]);
 }
 
-
 // Cria a matriz jacobiana a partir das derivadas
-static void calcula_jacobiana(double * restrict a, double * restrict c, double * restrict d, double * restrict X, size_t n)
+static void calcula_jacobiana(double *restrict a, double *restrict c, double *restrict d, double *restrict X, size_t n)
 {
     rtime_t tempoAntes = timestamp();
     LIKWID_MARKER_START("Jacobiana");
@@ -126,7 +125,7 @@ static inline void inverte_vetor(double *X, size_t n)
 }
 
 // Soma dois vetores e guarda o resultado no primeiro vetor
-static inline void soma_vetores(double * restrict a, double * restrict b, size_t n)
+static inline void soma_vetores(double *restrict a, double *restrict b, size_t n)
 {
     for (size_t i = 0; i < n; i++)
         a[i] += b[i];
