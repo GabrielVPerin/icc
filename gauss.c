@@ -4,10 +4,6 @@
 #include "gauss.h"
 #include "utils.h"
 
-// POSSIVEIS OTIMIZAÇÕES
-// 1 - É possivel utilizar uma eliminacao de gauss simplificada para matrizes 3-diagonais (tem uma aula sobre isso)
-// 2 - Loop unrolling
-
 rtime_t tempoSL = 0;
 
 // Implementa eliminacao de gauss

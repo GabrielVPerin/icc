@@ -1,19 +1,21 @@
 CC = gcc
 
 CFLAGS = -Wall -Wextra -O3 -march=native -mavx -fopt-info-vec
-CFLAGS2 = -Wall -Wextra
 
-CPPFLAGS = -DLIKWID_PERFMON -I/home/soft/likwid/include
-LDFLAGS = -L/home/soft/likwid/lib
-LDLIBS = -llikwid -lm
+# Mantemos o diretório de include globalmente para o compilador não reclamar do 
+# #include <likwid.h> nos arquivos fonte, mesmo quando não for calcular a performance.
+CPPFLAGS = -I/home/soft/likwid/include
+# Por padrão, linkamos apenas a biblioteca matemática.
+LDLIBS = -lm
 
 TARGET = broyden
 
 SRCS = main.c broyden.c gauss.c utils.c
 OBJS = $(SRCS:.c=.o)
 
-.PHONY: all clean debug noflags
+.PHONY: all clean likwid
 
+# "make" padrão compila com otimizações (-O3, -mavx, etc), mas SEM O LIKWID.
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
@@ -22,11 +24,12 @@ $(TARGET): $(OBJS)
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
 
-noflags: CFLAGS=$(CFLAGS2)
-noflags: clean $(TARGET)
-
-debug: clean
-	$(CC) -Wall -Wextra -O2 $(SRCS) -lm -o broyden
+# "make likwid" injeta as macros e caminhos de biblioteca do likwid 
+# e força a recompilação limpa.
+likwid: CPPFLAGS += -DLIKWID_PERFMON
+likwid: LDFLAGS += -L/home/soft/likwid/lib
+likwid: LDLIBS += -llikwid
+likwid: clean $(TARGET)
 
 clean:
 	rm -f $(OBJS) $(TARGET) *.csv *.log *.txt

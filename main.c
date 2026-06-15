@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <likwid.h>
 
 #include "broyden.h"
 #include "utils.h"
 #include "gauss.h"
 
-#include <likwid.h>
 int main(int argc, char **argv)
 {
     if (argc < 5 || argc > 7)

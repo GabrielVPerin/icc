@@ -9,41 +9,8 @@
 
 #include <likwid.h>
 
-// POSSIVEIS OTIMIZAÇÕES
-// 1 - Não utilizar a função pow
-// 2 - Melhorar alocação de matriz
-// 3 - Jacobiana é formada por uma matriz 3-diagonal, talvez seja possivel representá-la por 3 vetores
-// 4 - Usar funções inline (principalmente nas funções auxiliares)
-// 5 - Loop unrolling
-
 rtime_t tempoJacobiana = 0;
 FILE *saidaArq;
-
-// Calcula o resultado de uma linha do sistema de broyden
-/*static inline double equacoes_broyden(size_t linha, size_t n, double *X)
-{
-    if (linha == 0)
-        return (-2.0 * (X[0] * X[0]) + 3.0 * X[0] - 2.0 * X[1] + 1.0);
-    else if (linha == n - 1)
-        return (-2.0 * (X[linha] * X[linha]) + 3.0 * X[linha] - X[linha - 1]);
-
-    return (-2.0 * (X[linha] * X[linha])+ 3.0 * X[linha] - X[linha - 1] - 2.0 * X[linha + 1] + 1.0);
-}
-*/
-
-// Calcula o resultado da derivada de uma linha do sistema de broyden
-/*static inline double derivadas_broyden(size_t linha, size_t variavelDerivada, double *X)
-{
-    if (linha == variavelDerivada)
-        return (-4.0 * X[linha] + 3.0);
-    else if (linha == (variavelDerivada - 1))
-        return -2.0;
-    else if (linha == (variavelDerivada + 1))
-        return -1.0;
-
-    return 0.0;
-}
-*/
 
 // Calcula todas as linhas do sistema de broyden
 static void calcula_broyden(double *restrict Fx, double *restrict X, size_t n)
@@ -72,10 +39,6 @@ static void calcula_jacobiana(double *restrict a, double *restrict c, double *re
     LIKWID_MARKER_START("Jacobiana");
     for (size_t i = 0; i < n - n % 4; i = i + 4)
     {
-        // d[i] = derivadas_broyden(i, i, X);
-        // a[i] = derivadas_broyden(i + 1, i, X);
-        // c[i] = derivadas_broyden(i, i + 1, X);
-
         d[i] = -4.0 * X[i] + 3.0;
         a[i] = -1.0;
         c[i] = -2.0;
